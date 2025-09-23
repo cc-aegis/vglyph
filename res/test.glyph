@@ -1,0 +1,27 @@
+§ box, object, thing := 0.1, 0.1 -> 0.1, 0.9 -> 0.9, 0.9 -> 0.9, 0.1
+    ? {} := 0, 0 => 1, 1 + 0.15, 0.15 => 0.85, 0.85;
+§ person, human, man := 0.5, 0.1 -> 0.5, 0.4
+    + 0.5, 0.4 ~> 0.5, 0.65 -> 0.1, 0.1
+    + 0.5, 0.5 ~> 0.5, 0.65 -> 0.9, 0.1
+    + 0.1, 0.4 -> 0.9, 0.4;
+corpse := human + 0.8, 0.6 -> 0.6, 0.8;
+Partner, friend, bond := human | human;
+captured := box { human };
+own, property := human / box;
+
+security := hand { not { corpse } }
+
+
+"i forgot the meaning lol" := [not]|[box];
+
+# Thing -> streched
+# [[Thing]] -> into square
+# [Thing] -> halfway to square
+
+
+
+&&feeling|sun/pair
+
+[box]|[box]
+[[box]]/(box|box)
+box/box|box/box
