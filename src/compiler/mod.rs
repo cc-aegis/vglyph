@@ -41,6 +41,10 @@ fn interpolate(progress: f32, dots: &[(f32, f32)]) -> Option<(f32, f32)> {
 
 
 fn compile_smooth_line(dots: &[(f32, f32)]) -> Vec<Line> {
+    if let [start, end] = dots {
+        return vec![(*start, *end)];
+    }
+
     const LINE_STEPS: usize = 20;
     (0..LINE_STEPS + 1)
         .flat_map(|idx| interpolate(idx as f32 / LINE_STEPS as f32, dots))
