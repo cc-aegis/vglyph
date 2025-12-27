@@ -1,18 +1,13 @@
-#![feature(box_patterns)]
+use vglyph::compile;
 
-mod compiler;
-pub mod lexer;
-pub mod parser;
+// TODO: run cli from here
 
 fn main() {
     let input = include_str!("../res/beta.glyph");
-    let map = compiler::compile(input);
+    let map = compile(input);
 
     dbg!(&map);
 }
-
-
-
 
 
 

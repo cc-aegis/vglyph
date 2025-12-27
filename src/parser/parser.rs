@@ -156,6 +156,7 @@ impl Iterator for Parser<'_> {
 
     fn next(&mut self) -> Option<(Vec<String>, SyntaxTree)> {
         //[§|E] name[, name]* := value [? [op|E] := value]* ;
+        #[allow(unused_variables)]
         let is_radical = self.lexer.next_if(|it| matches!(it, Token::Section)).is_some();
         let mut names = vec![expect!(self.lexer, Token::Ident(n), n)?];
         loop {
