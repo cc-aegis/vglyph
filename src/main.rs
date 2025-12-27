@@ -3,7 +3,7 @@ use vglyph::compile;
 // TODO: run cli from here
 
 fn main() {
-    let input = include_str!("../res/beta.glyph");
+    let input = include_str!("../res/test_inner.glyph");
     let map = compile(input);
 
     dbg!(&map);

@@ -1,5 +1,6 @@
 use std::iter::Peekable;
 use crate::lexer::{Lexer, Token};
+use crate::parser::character::{Annotations, Character};
 use crate::parser::SyntaxTree;
 
 pub struct Parser<'a> {
@@ -148,15 +149,71 @@ impl<'a> Parser<'a> {
             Some(SyntaxTree::Plus(result))
         }
     }
+
+
+    fn parse_bounds_as_rect_pair(&mut self) -> Option<((f32, f32), (f32, f32))> {
+        let Some(Token::ValuePair(x, y)) = self.lexer.next() else {
+            return None;
+        };
+
+        let Some(SyntaxTree::Bounds(start, end)) = self.parse_bound((x, y)) else {
+            return None;
+        };
+
+        Some((start, end))
+    }
+
+    fn parse_annotation(&mut self, annotations: &mut Annotations) -> Option<()> {
+        // := standalone
+        // {} := outer + inner;
+        match self.lexer.next()? {
+            Token::LCurly => {
+                let Some(Token::RCurly) = self.lexer.next() else {
+                    return None;
+                };
+
+                let Some(Token::Assign) = self.lexer.next() else {
+                    return None;
+                };
+
+                let start = self.parse_bounds_as_rect_pair()?;
+
+                let Some(Token::Plus) = self.lexer.next() else {
+                    return None;
+                };
+
+                let end = self.parse_bounds_as_rect_pair()?;
+
+                annotations.inner = (start, end);
+
+                Some(())
+            },
+            Token::Assign => {
+                let rect = self.parse_bounds_as_rect_pair()?;
+
+                annotations.standalone = rect;
+
+                Some(())
+            },
+            _ => None,
+        }
+    }
+
+    fn parse_annotations(&mut self) -> Option<Annotations> {
+        let mut result = Annotations::new();
+        while self.lexer.next_if_eq(&Token::QuestionMark).is_some() {
+            self.parse_annotation(&mut result)?;
+        }
+        Some(result)
+    }
 }
 
 
 impl Iterator for Parser<'_> {
-    type Item = (Vec<String>, SyntaxTree);
+    type Item = Character;
 
-    fn next(&mut self) -> Option<(Vec<String>, SyntaxTree)> {
+    fn next(&mut self) -> Option<Character> {
         //[§|E] name[, name]* := value [? [op|E] := value]* ;
-        #[allow(unused_variables)]
         let is_radical = self.lexer.next_if(|it| matches!(it, Token::Section)).is_some();
         let mut names = vec![expect!(self.lexer, Token::Ident(n), n)?];
         loop {
@@ -167,10 +224,17 @@ impl Iterator for Parser<'_> {
             }
             names.push(expect!(self.lexer, Token::Ident(n), n)?);
         }
-        let tree = self.parse_tree()?;
+        let syntax_tree = self.parse_tree()?;
+
+        let annotations = self.parse_annotations()?;
 
         let Some(Token::Semicolon) = self.lexer.next() else { return None; };
 
-        Some((names, tree))
+        Some(Character {
+            is_radical,
+            names,
+            syntax_tree,
+            annotations,
+        })
     }
 }

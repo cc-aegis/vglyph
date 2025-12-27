@@ -2,6 +2,7 @@ mod compiler;
 
 use std::collections::HashMap;
 use crate::lexer::Lexer;
+use crate::parser::character::Annotations;
 use crate::parser::Parser;
 
 
@@ -11,13 +12,15 @@ type Rect = (f32, f32, f32, f32);
 pub fn compile(src: &str) -> HashMap<String, Vec<Line>> {
     let lexer = Lexer::new(src);
     let mut parser = Parser::new(lexer.peekable());
-    let mut map: HashMap<String, Vec<Line>> = HashMap::new();
+    let mut map: HashMap<String, (Vec<Line>, Annotations)> = HashMap::new();
 
     while let Some(mut next) = parser.next() {
-        map.insert(next.0.remove(0), next.1.compile(&map, (0.0, 0.0, 1.0, 1.0)));
+        let lines = next.syntax_tree.compile(&map, (0.0, 0.0, 1.0, 1.0));
+        map.insert(next.names.remove(0), (lines, next.annotations));
     }
 
-    map
+    // TODO: apply standalone bounds
+    map.into_iter().map(|(k, (v, _))| (k, v)).collect()
 }
 
 fn interpolate(progress: f32, dots: &[(f32, f32)]) -> Option<(f32, f32)> {

@@ -60,7 +60,7 @@ impl<'a> Lexer<'a> {
             Some(_) => todo!(),
             None => {
                 let mut result = String::new();
-                while let Some(c) = self.chars.next_if(|c| c.is_alphabetic() || *c == '_') {
+                while let Some(c) = self.chars.next_if(|c| c.is_alphabetic() || *c == '_' || *c == '-') {
                     result.push(c);
                 }
                 Some(Token::Ident(result))
@@ -101,7 +101,7 @@ impl Iterator for Lexer<'_> {
             '}' => Some(Token::RCurly),
             '|' => Some(Token::Pipe),
             '/' => Some(Token::Slash),
-            '?' => Some(Token::Slash),
+            '?' => Some(Token::QuestionMark),
             ';' => Some(Token::Semicolon),
             '§' => Some(Token::Section),
             '&' => Some(Token::Ampersand),

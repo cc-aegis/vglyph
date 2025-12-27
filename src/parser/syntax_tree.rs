@@ -1,4 +1,4 @@
-
+// TODO: add Annotated(...) for ? ... instead of storing annotations separately -> also allows (... ? {} := ...) { ... } being inlined
 #[derive(Debug)]
 pub enum SyntaxTree {
     Ident(String),

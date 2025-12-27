@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::compiler::{compile_smooth_line, Line};
+use crate::parser::character::Annotations;
 use crate::parser::SyntaxTree;
 
 impl SyntaxTree {
@@ -10,7 +11,7 @@ impl SyntaxTree {
         }
     }
 
-    pub fn compile(&self, reference: &HashMap<String, Vec<Line>>, bounds: (f32, f32, f32, f32)) -> Vec<Line> {
+    pub fn compile(&self, reference: &HashMap<String, (Vec<Line>, Annotations)>, bounds: (f32, f32, f32, f32)) -> Vec<Line> {
         match self {
             SyntaxTree::Lines(lines) => {
                 let lines = lines
@@ -90,10 +91,17 @@ impl SyntaxTree {
                 dbg!("todo: fit bounds inside current bounds");
                 tree.compile(reference, (start.0, start.1, end.0, end.1))
             },
+            SyntaxTree::Inner(box SyntaxTree::Ident(outer), inner) => {
+                let (outer_lines, Annotations { inner: (outer_rect, inner_rect), .. }) = reference.get(outer).unwrap();
+                let outer = fit_inside(outer_lines.clone(), (outer_rect.0.0, outer_rect.0.1, outer_rect.1.0, outer_rect.1.1));
+                let inner = inner.compile(reference, (inner_rect.0.0, inner_rect.0.1, inner_rect.1.0, inner_rect.1.1));
+                let combined = [outer, inner].concat();
+                fit_inside(combined, bounds)
+            },
             SyntaxTree::Ident(ident) => {
                 dbg!("todo: remove unwrap");
-                fit_inside(reference.get(ident).unwrap().clone(), bounds)
-            }
+                fit_inside(reference.get(ident).unwrap().0.clone(), bounds)
+            },
             _ => todo!()
         }
     }
