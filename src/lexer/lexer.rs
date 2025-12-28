@@ -69,7 +69,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn skip_comment(&mut self) {
-        if let Some('#') = self.chars.peek() {
+        while let Some('#') = self.chars.peek() {
             while !matches!(self.chars.peek(), Some('\n')) {
                 self.chars.next();
             }
