@@ -61,7 +61,7 @@ impl SyntaxTree {
                     .map(SyntaxTree::weight)
                     .sum();
                 let mut result = Vec::new();
-                let mut x: f32 = 0.0;
+                let mut x: f32 = bounds.0;
                 for tree in trees {
                     let weight = tree.weight();
                     let width = weight / total_weight * (bounds.2 - bounds.0);
@@ -77,7 +77,7 @@ impl SyntaxTree {
                     .map(SyntaxTree::weight)
                     .sum();
                 let mut result = Vec::new();
-                let mut y: f32 = 0.0;
+                let mut y: f32 = bounds.1;
                 for tree in trees {
                     let weight = tree.weight();
                     let height = weight / total_weight * (bounds.3 - bounds.1);
